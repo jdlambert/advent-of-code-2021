@@ -1,0 +1,64 @@
+use std::collections::HashMap;
+use std::fs;
+
+type Pair = (i32, i32, i32, i32);
+
+fn dir(a0: i32, a1: i32) -> i32 {
+    if a0 > a1 {
+        -1
+    } else if a0 < a1 {
+        1
+    } else {
+        0
+    }
+}
+
+fn dist(pair: Pair) -> i32 {
+    let (x0, y0, x1, y1) = pair;
+    (x0 - x1).abs().max((y0 - y1).abs())
+}
+
+fn overlaps(pairs: &Vec<Pair>) -> usize {
+    let mut map: HashMap<(i32, i32), i32> = HashMap::new();
+    for pair in pairs {
+        let &(x0, y0, x1, y1) = pair;
+        let dx = dir(x0, x1);
+        let dy = dir(y0, y1);
+        let len = dist(*pair);
+        for i in 0..=len {
+            let entry = map.entry((x0 + dx * i, y0 + dy * i)).or_insert(0);
+            *entry += 1;
+        }
+    }
+    map.values().filter(|&&val| val > 1).count()
+}
+
+fn part1(pairs: &Vec<Pair>) -> usize {
+    let straight_lines = pairs
+        .iter()
+        .filter(|(x0, y0, x1, y1)| x0 == x1 || y0 == y1)
+        .cloned()
+        .collect();
+    overlaps(&straight_lines)
+}
+
+fn part2(pairs: &Vec<Pair>) -> usize {
+    overlaps(pairs)
+}
+
+fn main() {
+    let content = fs::read_to_string("./input.txt").unwrap();
+    let lines = content.lines();
+    let pairs: Vec<Pair> = lines
+        .map(|line| {
+            let splits: Vec<i32> = line
+                .split(|c: char| !c.is_digit(10))
+                .filter_map(|num| num.parse::<i32>().ok())
+                .collect();
+            (splits[0], splits[1], splits[2], splits[3])
+        })
+        .collect();
+    println!("Part 1: {:?}", pairs);
+    println!("Part 1: {}", part1(&pairs));
+    println!("Part 2: {}", part2(&pairs));
+}
