@@ -7,7 +7,6 @@ fn part1(data: &Vec<i32>) -> i32 {
 
 fn part2(data: &Vec<i32>) -> i32 {
     let mean: i32 = data.iter().sum::<i32>() / data.len() as i32;
-
     data.iter()
         .map(|&pos| (pos - mean).abs())
         .map(|n| n * (n + 1) / 2)
