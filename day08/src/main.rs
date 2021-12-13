@@ -36,10 +36,8 @@ fn contains(container: &str, containee: &str) -> bool {
         .all(|letter| container.chars().find(|&c| c == letter).is_some())
 }
 
-fn difference(a: &str, b: &str) -> String {
-    a.chars()
-        .filter(|letter| b.chars().find(|c| c == letter).is_none())
-        .collect()
+fn find_symbol<'a>(candidates: &'a Vec<&str>, predicate: impl Fn(&&&str) -> bool) -> &'a str {
+    candidates.iter().find(predicate).unwrap()
 }
 
 fn solve_note(note: &Vec<Vec<String>>) -> u32 {
@@ -58,43 +56,23 @@ fn solve_note(note: &Vec<Vec<String>>) -> u32 {
     let four = len_n_symbol(input, 4); // bcdf
     symbol_table.insert(four, '4');
 
-    let two_three_five = len_n_symbols(input, 5); // acdeg, acdfg, abdfg
-
-    let three = two_three_five
-        .iter()
-        .find(|symbol| contains(symbol, one))
-        .unwrap();
-
-    let five = two_three_five
-        .iter()
-        .find(|symbol| contains(symbol, &difference(four, one)))
-        .unwrap();
-
-    let two = two_three_five
-        .iter()
-        .find(|&s| s != three && s != five)
-        .unwrap();
-
-    symbol_table.insert(two, '2');
-    symbol_table.insert(three, '3');
-    symbol_table.insert(five, '5');
-
     let zero_six_nine = len_n_symbols(input, 6); // abcefg, abdefg, abcdfg
-    let six = zero_six_nine
-        .iter()
-        .find(|&symbol| !contains(symbol, one))
-        .unwrap();
-    let nine = zero_six_nine
-        .iter()
-        .find(|&symbol| contains(symbol, four))
-        .unwrap();
-    let zero = zero_six_nine
-        .iter()
-        .find(|&symbol| symbol != six && symbol != nine)
-        .unwrap();
+    let six = find_symbol(&zero_six_nine, |symbol| !contains(symbol, one));
+    let nine = find_symbol(&zero_six_nine, |symbol| contains(symbol, four));
+    let zero = find_symbol(&zero_six_nine, |&&symbol| symbol != six && symbol != nine);
     symbol_table.insert(zero, '0');
     symbol_table.insert(six, '6');
     symbol_table.insert(nine, '9');
+
+    let two_three_five = len_n_symbols(input, 5); // acdeg, acdfg, abdfg
+    let three = find_symbol(&two_three_five, |symbol| contains(symbol, one));
+    let five = find_symbol(&two_three_five, |symbol| contains(six, symbol));
+    let two = find_symbol(&two_three_five, |&&symbol| {
+        symbol != three && symbol != five
+    });
+    symbol_table.insert(two, '2');
+    symbol_table.insert(three, '3');
+    symbol_table.insert(five, '5');
 
     let digits: String = output
         .iter()
