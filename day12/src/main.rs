@@ -4,42 +4,39 @@ use std::fs;
 type Graph<'a> = HashMap<&'a str, Vec<&'a str>>;
 
 fn count_paths(graph: &Graph, small_cave_exception: bool) -> u32 {
-    let mut path = vec!["start"];
     let mut blocked = HashSet::new();
-    count_paths_helper(graph, &mut path, &mut blocked, small_cave_exception)
+    count_paths_helper(graph, "start", &mut blocked, small_cave_exception)
 }
 
 fn count_paths_helper<'a>(
     graph: &Graph<'a>,
-    path: &mut Vec<&'a str>,
+    current: &str,
     blocked: &mut HashSet<&'a str>,
     small_cave_exception: bool,
 ) -> u32 {
-    graph[path.last().unwrap()]
+    graph[current]
         .iter()
-        .filter_map(|neighbor| match *neighbor {
-            "end" => Some(1),
-            "start" => None,
+        .map(|neighbor| match *neighbor {
+            "end" => 1,
+            "start" => 0,
             _ => {
                 if blocked.contains(neighbor) && !small_cave_exception {
-                    return None;
+                    return 0;
                 }
                 let used_exception = blocked.contains(neighbor) && small_cave_exception;
-                path.push(neighbor);
                 if !neighbor.chars().next().unwrap().is_ascii_uppercase() {
                     blocked.insert(neighbor);
                 }
                 let count = count_paths_helper(
                     graph,
-                    path,
+                    neighbor,
                     blocked,
                     small_cave_exception && !used_exception,
                 );
                 if !used_exception {
                     blocked.remove(neighbor);
                 }
-                path.pop();
-                Some(count)
+                count
             }
         })
         .sum()
