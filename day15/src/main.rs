@@ -22,7 +22,7 @@ fn solve(grid: &Vec<Vec<u32>>, factor: usize) -> u32 {
     frontier.push(Reverse((0, (0, 0))));
     let mut visited = HashSet::new();
 
-    while !frontier.is_empty() {
+    loop {
         let Reverse((risk, (i, j))) = frontier.pop().unwrap();
         if visited.contains(&(i, j)) {
             continue;
@@ -51,8 +51,6 @@ fn solve(grid: &Vec<Vec<u32>>, factor: usize) -> u32 {
                 .map(|&(i, j)| Reverse((risk + cell_risk(i, j, grid), (i, j)))),
         )
     }
-
-    unreachable!();
 }
 
 fn main() {
