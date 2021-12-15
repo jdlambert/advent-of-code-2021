@@ -2,7 +2,7 @@ use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashSet};
 use std::fs;
 
-fn cell_risk(i: usize, j: usize, factor: usize, grid: &Vec<Vec<u32>>) -> u32 {
+fn cell_risk(i: usize, j: usize, grid: &Vec<Vec<u32>>) -> u32 {
     let tile_i = (i / grid.len()) as u32;
     let tile_j = (j / grid[0].len()) as u32;
 
@@ -48,7 +48,7 @@ fn solve(grid: &Vec<Vec<u32>>, factor: usize) -> u32 {
         frontier.extend(
             neighbors
                 .iter()
-                .map(|&(i, j)| Reverse((risk + cell_risk(i, j, factor, grid), (i, j)))),
+                .map(|&(i, j)| Reverse((risk + cell_risk(i, j, grid), (i, j)))),
         )
     }
 
