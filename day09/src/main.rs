@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use std::fs;
 
 fn part1(heights: &Vec<Vec<u32>>) -> u32 {
     let mut risk = 0;
@@ -64,8 +63,7 @@ fn part2(heights: &Vec<Vec<u32>>) -> usize {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let heights: Vec<Vec<u32>> = content
+    let heights: Vec<Vec<u32>> = include_str!("../input.txt")
         .lines()
         .map(|line| {
             line.trim()

@@ -1,5 +1,3 @@
-use std::fs;
-
 fn part1(data: &Vec<i32>) -> i32 {
     let median = data[data.len() / 2];
     data.iter().map(|&pos| (pos - median).abs()).sum()
@@ -14,8 +12,7 @@ fn part2(data: &Vec<i32>) -> i32 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let mut data: Vec<i32> = content
+    let mut data: Vec<i32> = include_str!("../input.txt")
         .trim()
         .split(',')
         .map(|x| x.parse::<i32>().unwrap())

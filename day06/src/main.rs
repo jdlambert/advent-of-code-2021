@@ -1,5 +1,3 @@
-use std::fs;
-
 fn simulate(data: &Vec<usize>, days: u32) -> u64 {
     let mut counts = vec![0u64; 9];
     for &fish in data {
@@ -21,8 +19,7 @@ fn part2(data: &Vec<usize>) -> u64 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let data = content
+    let data = include_str!("../input.txt")
         .trim()
         .split(',')
         .map(|x| x.parse::<usize>().unwrap())

@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::fs;
 
 type Pair = (i32, i32, i32, i32);
 
@@ -47,9 +46,8 @@ fn part2(pairs: &Vec<Pair>) -> usize {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let lines = content.lines();
-    let pairs: Vec<Pair> = lines
+    let pairs: Vec<Pair> = include_str!("../input.txt")
+        .lines()
         .map(|line| {
             let splits: Vec<i32> = line
                 .split(|c: char| !c.is_digit(10))
@@ -58,7 +56,6 @@ fn main() {
             (splits[0], splits[1], splits[2], splits[3])
         })
         .collect();
-    println!("Part 1: {:?}", pairs);
     println!("Part 1: {}", part1(&pairs));
     println!("Part 2: {}", part2(&pairs));
 }

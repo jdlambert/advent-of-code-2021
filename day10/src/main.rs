@@ -1,5 +1,3 @@
-use std::fs;
-
 enum LineResult {
     Illegal(char),
     Incomplete(Vec<char>),
@@ -84,8 +82,10 @@ fn part2(data: &Vec<Vec<char>>) -> u64 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let lines = content.lines().map(|line| line.chars().collect()).collect();
+    let lines = include_str!("../input.txt")
+        .lines()
+        .map(|line| line.chars().collect())
+        .collect();
     println!("Part 1: {}", part1(&lines));
     println!("Part 2: {}", part2(&lines));
 }

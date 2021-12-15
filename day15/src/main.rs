@@ -1,6 +1,5 @@
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashSet};
-use std::fs;
 
 fn cell_risk(i: usize, j: usize, grid: &Vec<Vec<u32>>) -> u32 {
     let tile_i = (i / grid.len()) as u32;
@@ -24,14 +23,13 @@ fn solve(grid: &Vec<Vec<u32>>, factor: usize) -> u32 {
 
     loop {
         let Reverse((risk, (i, j))) = frontier.pop().unwrap();
-        if visited.contains(&(i, j)) {
+        if !visited.insert((i, j)) {
             continue;
         }
-        visited.insert((i, j));
-
         if (i, j) == (height - 1, width - 1) {
             return risk;
         }
+
         let mut neighbors = vec![];
         if i > 0 {
             neighbors.push((i - 1, j));
@@ -54,7 +52,7 @@ fn solve(grid: &Vec<Vec<u32>>, factor: usize) -> u32 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
+    let content = include_str!("../input.txt");
     let tile = content
         .lines()
         .map(|line| {

@@ -1,9 +1,8 @@
 #![feature(drain_filter)]
-use std::fs;
 
 type Board = Vec<Vec<i32>>;
 
-fn read_boards(input: String) -> (Vec<i32>, Vec<Board>) {
+fn read_boards(input: &str) -> (Vec<i32>, Vec<Board>) {
     let parts = input.split("\n\n").collect::<Vec<_>>();
 
     let values = parts[0]
@@ -76,8 +75,7 @@ fn part2(scores: &Vec<i32>) -> i32 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let (values, boards) = read_boards(content);
+    let (values, boards) = read_boards(include_str!("../input.txt"));
     let scores = score_boards(values, boards);
     println!("Part 1: {}", part1(&scores));
     println!("Part 2: {}", part2(&scores));

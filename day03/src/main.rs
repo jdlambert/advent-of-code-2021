@@ -1,5 +1,3 @@
-use std::fs;
-
 fn digit_delta(data: &Vec<&str>, index: usize) -> i32 {
     let delta = data.iter().fold(0i32, |delta, &line| {
         delta
@@ -52,8 +50,7 @@ fn part2(data: &Vec<&str>) -> u32 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let data = content.lines().collect();
+    let data = include_str!("../input.txt").lines().collect();
     println!("Part 1: {}", part1(&data));
     println!("Part 2: {}", part2(&data));
 }

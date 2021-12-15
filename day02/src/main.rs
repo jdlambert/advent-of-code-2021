@@ -1,5 +1,3 @@
-use std::fs;
-
 fn part1(data: &Vec<Vec<&str>>) -> i64 {
     let (x, y) = data.iter().fold((0, 0), |(x, y), operation| {
         let command = operation[0];
@@ -29,9 +27,8 @@ fn part2(data: &Vec<Vec<&str>>) -> i64 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let lines = content.lines();
-    let data = lines
+    let data = include_str!("../input.txt")
+        .lines()
         .map(|line| line.split_whitespace().collect::<Vec<&str>>())
         .collect();
     println!("Part 1: {}", part1(&data));

@@ -1,5 +1,4 @@
 use std::collections::{HashMap, HashSet};
-use std::fs;
 
 type Graph<'a> = HashMap<&'a str, Vec<&'a str>>;
 
@@ -51,9 +50,8 @@ fn part2(graph: &Graph) -> u32 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
     let mut graph: Graph = HashMap::new();
-    for line in content.lines() {
+    for line in include_str!("../input.txt").lines() {
         let mut splits = line.split('-');
         let l = splits.next().unwrap();
         let r = splits.next().unwrap();

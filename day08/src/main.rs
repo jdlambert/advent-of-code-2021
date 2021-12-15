@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::fs;
 
 fn part1(notes: &Vec<Vec<Vec<String>>>) -> usize {
     notes
@@ -98,9 +97,8 @@ fn parse_note(note: &str) -> Vec<String> {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let lines = content.lines();
-    let data: Vec<Vec<Vec<String>>> = lines
+    let data: Vec<Vec<Vec<String>>> = include_str!("../input.txt")
+        .lines()
         .map(|line| line.split('|').map(parse_note).collect())
         .collect();
     println!("Part 1: {}", part1(&data));

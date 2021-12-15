@@ -1,5 +1,3 @@
-use std::fs;
-
 fn flash(octopi: &mut Vec<Vec<u32>>, i: usize, j: usize) -> u64 {
     let mut flashes = 1;
     octopi[i][j] = 0;
@@ -52,8 +50,7 @@ fn part2(octopi: &Vec<Vec<u32>>) -> u64 {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let octopi: Vec<Vec<u32>> = content
+    let octopi: Vec<Vec<u32>> = include_str!("../input.txt")
         .lines()
         .map(|line| {
             line.chars()

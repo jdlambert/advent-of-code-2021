@@ -1,7 +1,6 @@
 #![feature(hash_drain_filter)]
 
 use std::collections::HashSet;
-use std::fs;
 
 enum Fold {
     X(usize),
@@ -60,11 +59,8 @@ fn part2(points: &HashSet<(usize, usize)>, folds: &Vec<Fold>) -> String {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let mut splits = content.split("\n\n");
-    let points = splits
-        .next()
-        .unwrap()
+    let (points, folds) = include_str!("../input.txt").split_once("\n\n").unwrap();
+    let points = points
         .lines()
         .map(|line| {
             let mut digits = line.split(',');
@@ -75,9 +71,7 @@ fn main() {
         })
         .collect();
 
-    let folds = splits
-        .next()
-        .unwrap()
+    let folds = folds
         .lines()
         .map(|line| {
             let mut params = line.strip_prefix("fold along ").unwrap().split('=');

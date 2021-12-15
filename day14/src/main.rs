@@ -1,7 +1,6 @@
 #![feature(hash_drain_filter)]
 
 use std::collections::HashMap;
-use std::fs;
 
 type Pair = (char, char);
 type Operations = HashMap<Pair, char>;
@@ -45,8 +44,7 @@ fn part2(polymer: &Polymer, operations: &Operations) -> usize {
 }
 
 fn main() {
-    let content = fs::read_to_string("./input.txt").unwrap();
-    let (polymer, operations) = content.split_once("\n\n").unwrap();
+    let (polymer, operations) = include_str!("../input.txt").split_once("\n\n").unwrap();
 
     let first = polymer.chars().nth(0).unwrap();
     let last = polymer.chars().nth_back(0).unwrap();
