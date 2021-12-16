@@ -13,19 +13,15 @@ struct PacketParser {
     i: usize,
 }
 
-impl Packet {
-    fn from_str(binary: &str) -> Self {
-        let mut parser = PacketParser::new(binary);
-        parser.parse()
-    }
-}
-
 impl PacketParser {
-    fn new(binary: &str) -> Self {
-        PacketParser {
-            binary: binary.to_owned(),
-            i: 0,
-        }
+    fn parse(hex: &str) -> Packet {
+        let binary = hex
+            .trim()
+            .chars()
+            .map(|ch| format!("{:04b}", ch.to_digit(16).unwrap()))
+            .collect();
+        let mut parser = PacketParser { binary, i: 0 };
+        parser.parse_helper()
     }
 
     fn read(&mut self, take: usize) -> u64 {
@@ -49,7 +45,7 @@ impl PacketParser {
     fn parse_operator(&mut self, version: u64, opcode: u64) -> Packet {
         if self.read(1) == 1 {
             let packet_count = self.read(11);
-            let packets = (0..packet_count).map(|_| self.parse()).collect();
+            let packets = (0..packet_count).map(|_| self.parse_helper()).collect();
 
             Packet {
                 version,
@@ -59,7 +55,7 @@ impl PacketParser {
             let ending_bit = self.read(15) as usize + self.i;
             let mut packets = vec![];
             while self.i < ending_bit {
-                packets.push(self.parse());
+                packets.push(self.parse_helper());
             }
             Packet {
                 version,
@@ -68,7 +64,7 @@ impl PacketParser {
         }
     }
 
-    fn parse(&mut self) -> Packet {
+    fn parse_helper(&mut self) -> Packet {
         let version = self.read(3);
         let opcode = self.read(3);
 
@@ -80,60 +76,52 @@ impl PacketParser {
     }
 }
 
-fn evaluate(packet: &Packet) -> u64 {
-    match &packet.inner {
-        InnerPacket::Literal(v) => *v,
-        InnerPacket::Operator { opcode, packets } => {
-            let mut packets = packets.iter().map(evaluate);
-            match opcode {
-                0 => packets.sum(),
-                1 => packets.product(),
-                2 => packets.min().unwrap(),
-                3 => packets.max().unwrap(),
-                5..=7 => {
-                    let (a, b) = (packets.next(), packets.next());
-                    if match opcode {
-                        5 => a > b,
-                        6 => a < b,
-                        7 => a == b,
-                        _ => unreachable!(),
-                    } {
-                        1
-                    } else {
-                        0
+impl Packet {
+    fn evaluate(&self) -> u64 {
+        match &self.inner {
+            InnerPacket::Literal(v) => *v,
+            InnerPacket::Operator { opcode, packets } => {
+                let mut packets = packets.iter().map(|p| p.evaluate());
+                match opcode {
+                    0 => packets.sum(),
+                    1 => packets.product(),
+                    2 => packets.min().unwrap(),
+                    3 => packets.max().unwrap(),
+                    5..=7 => {
+                        let (a, b) = (packets.next(), packets.next());
+                        (match opcode {
+                            5 => a > b,
+                            6 => a < b,
+                            7 => a == b,
+                            _ => unreachable!(),
+                        }) as u64
                     }
+                    _ => unreachable!(),
                 }
-                _ => unreachable!(),
             }
         }
     }
-}
 
-fn version_sum(packet: &Packet) -> u64 {
-    packet.version
-        + if let InnerPacket::Operator { opcode: _, packets } = &packet.inner {
-            packets.iter().map(|p| version_sum(p)).sum()
-        } else {
-            0
-        }
+    fn version_sum(&self) -> u64 {
+        self.version
+            + if let InnerPacket::Operator { opcode: _, packets } = &self.inner {
+                packets.iter().map(|p| p.version_sum()).sum()
+            } else {
+                0
+            }
+    }
 }
 
 fn part1(packet: &Packet) -> u64 {
-    version_sum(packet)
+    packet.version_sum()
 }
 
 fn part2(packet: &Packet) -> u64 {
-    evaluate(packet)
+    packet.evaluate()
 }
 
 fn main() {
-    let packet = Packet::from_str(
-        &include_str!("../input.txt")
-            .trim()
-            .chars()
-            .map(|ch| format!("{:04b}", ch.to_digit(16).unwrap()))
-            .collect::<String>(),
-    );
+    let packet = PacketParser::parse(include_str!("../input.txt"));
     println!("Part 1: {}", part1(&packet));
     println!("Part 2: {}", part2(&packet));
 }
