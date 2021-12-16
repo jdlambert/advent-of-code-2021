@@ -111,11 +111,7 @@ fn evaluate(packet: &Packet) -> u64 {
 fn version_sum(packet: &Packet) -> u64 {
     packet.version
         + if let InnerPacket::Operator { opcode: _, packets } = &packet.inner {
-            let mut sum = 0; // TODO: why can't I get this to work as an iter???
-            for p in packets {
-                sum += version_sum(p);
-            }
-            sum
+            packets.iter().map(|p| version_sum(p)).sum()
         } else {
             0
         }
