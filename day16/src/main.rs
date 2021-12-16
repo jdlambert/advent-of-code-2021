@@ -56,8 +56,7 @@ impl PacketParser {
                 inner: InnerPacket::Operator { opcode, packets },
             }
         } else {
-            let bit_count = self.read(15) as usize;
-            let ending_bit = self.i + bit_count;
+            let ending_bit = self.i + self.read(15) as usize;
             let mut packets = vec![];
             while self.i < ending_bit {
                 packets.push(self.parse());
