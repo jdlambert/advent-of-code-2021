@@ -12,10 +12,10 @@ fn part2(data: &Vec<i32>) -> i32 {
 }
 
 fn main() {
-    let mut data: Vec<i32> = include_str!("../input.txt")
+    let mut data: Vec<_> = include_str!("../input.txt")
         .trim()
         .split(',')
-        .map(|x| x.parse::<i32>().unwrap())
+        .map(|x| x.parse().unwrap())
         .collect();
     data.sort();
     println!("Part 1: {}", part1(&data));

@@ -46,7 +46,7 @@ fn basin_size(heights: &Vec<Vec<u32>>, i: usize, j: usize) -> usize {
 }
 
 fn part2(heights: &Vec<Vec<u32>>) -> usize {
-    let mut basin_sizes: Vec<usize> = vec![];
+    let mut basin_sizes = vec![];
     for (i, row) in heights.iter().enumerate() {
         for (j, &height) in row.iter().enumerate() {
             if (i == 0 || heights[i - 1][j] > height)
@@ -63,7 +63,7 @@ fn part2(heights: &Vec<Vec<u32>>) -> usize {
 }
 
 fn main() {
-    let heights: Vec<Vec<u32>> = include_str!("../input.txt")
+    let heights = include_str!("../input.txt")
         .lines()
         .map(|line| {
             line.trim()

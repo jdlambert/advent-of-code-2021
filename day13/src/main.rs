@@ -48,7 +48,7 @@ fn part2(points: &HashSet<(usize, usize)>, folds: &Vec<Fold>) -> String {
         })
         .last()
         .unwrap();
-    let mut builder: Vec<char> = vec!['\n'];
+    let mut builder = vec!['\n'];
     for j in 0..*y_max {
         for i in 0..*x_max {
             builder.push(if points.contains(&(i, j)) { '#' } else { '.' });
@@ -63,20 +63,16 @@ fn main() {
     let points = points
         .lines()
         .map(|line| {
-            let mut digits = line.split(',');
-            (
-                digits.next().unwrap().parse().unwrap(),
-                digits.next().unwrap().parse().unwrap(),
-            )
+            line.split_once(',').unwrap()
         })
+        .map(|(a, b)| (a.parse().unwrap(), b.parse().unwrap()))
         .collect();
 
     let folds = folds
         .lines()
         .map(|line| {
-            let mut params = line.strip_prefix("fold along ").unwrap().split('=');
-            let axis = params.next().unwrap();
-            let value = params.next().unwrap().parse().unwrap();
+            let (axis, value) = line.strip_prefix("fold along ").unwrap().split_once('=').unwrap();
+            let value = value.parse().unwrap();
             match axis {
                 "x" => Fold::X(value),
                 "y" => Fold::Y(value),

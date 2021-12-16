@@ -1,5 +1,5 @@
 fn simulate(data: &Vec<usize>, days: u32) -> u64 {
-    let mut counts = vec![0u64; 9];
+    let mut counts = vec![0; 9];
     for &fish in data {
         counts[fish] += 1;
     }
@@ -22,7 +22,7 @@ fn main() {
     let data = include_str!("../input.txt")
         .trim()
         .split(',')
-        .map(|x| x.parse::<usize>().unwrap())
+        .map(|x| x.parse().unwrap())
         .collect();
     println!("Part 1: {}", part1(&data));
     println!("Part 2: {}", part2(&data));

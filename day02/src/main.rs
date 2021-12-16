@@ -1,8 +1,7 @@
 fn part1(data: &Vec<Vec<&str>>) -> i64 {
     let (x, y) = data.iter().fold((0, 0), |(x, y), operation| {
-        let command = operation[0];
         let value: i64 = operation[1].parse().unwrap();
-        match command {
+        match operation[0] {
             "forward" => (x + value, y),
             "up" => (x, y - value),
             "down" => (x, y + value),
@@ -14,9 +13,8 @@ fn part1(data: &Vec<Vec<&str>>) -> i64 {
 
 fn part2(data: &Vec<Vec<&str>>) -> i64 {
     let (x, y, _) = data.iter().fold((0, 0, 0), |(x, y, aim), operation| {
-        let command = operation[0];
         let value: i64 = operation[1].parse().unwrap();
-        match command {
+        match operation[0] {
             "forward" => (x + value, y + value * aim, aim),
             "up" => (x, y, aim - value),
             "down" => (x, y, aim + value),
@@ -29,7 +27,7 @@ fn part2(data: &Vec<Vec<&str>>) -> i64 {
 fn main() {
     let data = include_str!("../input.txt")
         .lines()
-        .map(|line| line.split_whitespace().collect::<Vec<&str>>())
+        .map(|line| line.split_whitespace().collect())
         .collect();
     println!("Part 1: {}", part1(&data));
     println!("Part 2: {}", part2(&data));

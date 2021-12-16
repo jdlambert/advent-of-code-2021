@@ -9,7 +9,7 @@ fn part2(data: &Vec<u32>) -> usize {
 fn main() {
     let data = include_str!("../input.txt")
         .lines()
-        .map(|x| x.parse::<u32>().unwrap())
+        .map(|x| x.parse().unwrap())
         .collect();
     println!("Part 1: {}", part1(&data));
     println!("Part 2: {}", part2(&data));

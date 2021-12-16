@@ -52,9 +52,7 @@ fn part2(graph: &Graph) -> u32 {
 fn main() {
     let mut graph: Graph = HashMap::new();
     for line in include_str!("../input.txt").lines() {
-        let mut splits = line.split('-');
-        let l = splits.next().unwrap();
-        let r = splits.next().unwrap();
+        let (l, r) = line.split_once('-').unwrap();
 
         graph.entry(l).or_default().push(r);
         graph.entry(r).or_default().push(l);

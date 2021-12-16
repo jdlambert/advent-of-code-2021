@@ -42,7 +42,7 @@ fn find_symbol<'a>(candidates: &'a Vec<&str>, predicate: impl Fn(&&&str) -> bool
 fn solve_note(note: &Vec<Vec<String>>) -> u32 {
     let input = &note[0];
     let output = &note[1];
-    let mut symbol_table: HashMap<&str, char> = HashMap::new();
+    let mut symbol_table = HashMap::new();
 
     symbol_table.insert("abcdefg", '8'); // free symbol
 
@@ -97,7 +97,7 @@ fn parse_note(note: &str) -> Vec<String> {
 }
 
 fn main() {
-    let data: Vec<Vec<Vec<String>>> = include_str!("../input.txt")
+    let data = include_str!("../input.txt")
         .lines()
         .map(|line| line.split('|').map(parse_note).collect())
         .collect();

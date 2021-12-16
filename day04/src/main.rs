@@ -7,8 +7,8 @@ fn read_boards(input: &str) -> (Vec<i32>, Vec<Board>) {
 
     let values = parts[0]
         .split(',')
-        .map(|s| s.trim().parse::<i32>().unwrap())
-        .collect::<Vec<i32>>();
+        .map(|s| s.trim().parse().unwrap())
+        .collect();
 
     let boards = parts[1..]
         .iter()
@@ -18,7 +18,7 @@ fn read_boards(input: &str) -> (Vec<i32>, Vec<Board>) {
                 .map(|board_row| {
                     board_row
                         .split_whitespace()
-                        .map(|board_cell| board_cell.parse::<i32>().unwrap())
+                        .map(|board_cell| board_cell.parse().unwrap())
                         .collect()
                 })
                 .collect()

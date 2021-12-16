@@ -18,15 +18,13 @@ fn dist(pair: Pair) -> i32 {
 }
 
 fn overlaps(pairs: &Vec<Pair>) -> usize {
-    let mut map: HashMap<(i32, i32), i32> = HashMap::new();
+    let mut map = HashMap::new();
     for pair in pairs {
         let &(x0, y0, x1, y1) = pair;
         let dx = dir(x0, x1);
         let dy = dir(y0, y1);
-        let len = dist(*pair);
-        for i in 0..=len {
-            let entry = map.entry((x0 + dx * i, y0 + dy * i)).or_insert(0);
-            *entry += 1;
+        for i in 0..=dist(*pair) {
+            *map.entry((x0 + dx * i, y0 + dy * i)).or_insert(0) += 1;
         }
     }
     map.values().filter(|&&val| val > 1).count()
@@ -51,7 +49,7 @@ fn main() {
         .map(|line| {
             let splits: Vec<i32> = line
                 .split(|c: char| !c.is_digit(10))
-                .filter_map(|num| num.parse::<i32>().ok())
+                .filter_map(|num| num.parse().ok())
                 .collect();
             (splits[0], splits[1], splits[2], splits[3])
         })

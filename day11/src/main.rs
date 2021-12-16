@@ -50,7 +50,7 @@ fn part2(octopi: &Vec<Vec<u32>>) -> u64 {
 }
 
 fn main() {
-    let octopi: Vec<Vec<u32>> = include_str!("../input.txt")
+    let octopi = include_str!("../input.txt")
         .lines()
         .map(|line| {
             line.chars()
