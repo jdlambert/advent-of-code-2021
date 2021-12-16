@@ -4,10 +4,7 @@ fn part1(notes: &Vec<Vec<Vec<String>>>) -> usize {
         .map(|note| &note[1])
         .flatten()
         .filter(|output| match output.len() {
-            2 => true,
-            3 => true,
-            4 => true,
-            7 => true,
+            2 | 3 | 4 | 7 => true,
             _ => false,
         })
         .count()
