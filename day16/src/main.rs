@@ -90,22 +90,14 @@ fn evaluate(packet: &Packet) -> u64 {
                 1 => packets.product(),
                 2 => packets.min().unwrap(),
                 3 => packets.max().unwrap(),
-                5 => {
-                    if packets.next() > packets.next() {
-                        1
-                    } else {
-                        0
-                    }
-                }
-                6 => {
-                    if packets.next() < packets.next() {
-                        1
-                    } else {
-                        0
-                    }
-                }
-                7 => {
-                    if packets.next() == packets.next() {
+                5..=7 => {
+                    let (a, b) = (packets.next(), packets.next());
+                    if match opcode {
+                        5 => a > b,
+                        6 => a < b,
+                        7 => a == b,
+                        _ => unreachable!(),
+                    } {
                         1
                     } else {
                         0
