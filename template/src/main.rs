@@ -1,5 +1,3 @@
-use std::fs;
-
 fn part1(data: &Vec<u32>) -> &str {
     "nothing yet"
 }
