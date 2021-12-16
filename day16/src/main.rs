@@ -13,6 +13,13 @@ struct PacketParser {
     i: usize,
 }
 
+impl Packet {
+    fn from_str(binary: &str) -> Self {
+        let mut parser = PacketParser::new(binary);
+        parser.parse()
+    }
+}
+
 impl PacketParser {
     fn new(binary: &str) -> Self {
         PacketParser {
@@ -77,34 +84,37 @@ impl PacketParser {
 fn evaluate(packet: &Packet) -> u64 {
     match &packet.inner {
         InnerPacket::Literal(v) => *v,
-        InnerPacket::Operator { opcode, packets } => match opcode {
-            0 => packets.iter().map(evaluate).sum(),
-            1 => packets.iter().map(evaluate).product(),
-            2 => packets.iter().map(evaluate).min().unwrap(),
-            3 => packets.iter().map(evaluate).max().unwrap(),
-            5 => {
-                if evaluate(&packets[0]) > evaluate(&packets[1]) {
-                    1
-                } else {
-                    0
+        InnerPacket::Operator { opcode, packets } => {
+            let mut packets = packets.iter().map(evaluate);
+            match opcode {
+                0 => packets.sum(),
+                1 => packets.product(),
+                2 => packets.min().unwrap(),
+                3 => packets.max().unwrap(),
+                5 => {
+                    if packets.next() > packets.next() {
+                        1
+                    } else {
+                        0
+                    }
                 }
-            }
-            6 => {
-                if evaluate(&packets[0]) < evaluate(&packets[1]) {
-                    1
-                } else {
-                    0
+                6 => {
+                    if packets.next() < packets.next() {
+                        1
+                    } else {
+                        0
+                    }
                 }
-            }
-            7 => {
-                if evaluate(&packets[0]) == evaluate(&packets[1]) {
-                    1
-                } else {
-                    0
+                7 => {
+                    if packets.next() == packets.next() {
+                        1
+                    } else {
+                        0
+                    }
                 }
+                _ => unreachable!(),
             }
-            _ => unreachable!(),
-        },
+        }
     }
 }
 
@@ -126,15 +136,13 @@ fn part2(packet: &Packet) -> u64 {
 }
 
 fn main() {
-    let binary = &include_str!("../input.txt")
-        .trim()
-        .chars()
-        .map(|ch| ch.to_digit(16).unwrap())
-        .map(|digit| format!("{:04b}", digit).chars().collect::<Vec<_>>())
-        .flatten()
-        .collect::<String>();
-    let mut parser = PacketParser::new(binary);
-    let packet = parser.parse();
+    let packet = Packet::from_str(
+        &include_str!("../input.txt")
+            .trim()
+            .chars()
+            .map(|ch| format!("{:04b}", ch.to_digit(16).unwrap()))
+            .collect::<String>(),
+    );
     println!("Part 1: {}", part1(&packet));
     println!("Part 2: {}", part2(&packet));
 }
