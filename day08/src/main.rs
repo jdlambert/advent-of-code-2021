@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 fn part1(notes: &Vec<Vec<Vec<String>>>) -> usize {
     notes
         .iter()
@@ -42,43 +40,30 @@ fn find_symbol<'a>(candidates: &'a Vec<&str>, predicate: impl Fn(&&&str) -> bool
 fn solve_note(note: &Vec<Vec<String>>) -> u32 {
     let input = &note[0];
     let output = &note[1];
-    let mut symbol_table = HashMap::new();
+    let mut signals = vec![""; 10];
 
-    symbol_table.insert("abcdefg", '8'); // free symbol
-
-    let one = len_n_symbol(input, 2); // cf
-    symbol_table.insert(one, '1');
-
-    let seven = len_n_symbol(input, 3); // acf
-    symbol_table.insert(seven, '7');
-
-    let four = len_n_symbol(input, 4); // bcdf
-    symbol_table.insert(four, '4');
+    signals[8] = "abcdefg"; // free symbol
+    signals[1] = len_n_symbol(input, 2); // cf
+    signals[7] = len_n_symbol(input, 3); // acf
+    signals[4] = len_n_symbol(input, 4); // bcdf
 
     let zero_six_nine = len_n_symbols(input, 6); // abcefg, abdefg, abcdfg
-    let six = find_symbol(&zero_six_nine, |symbol| !contains(symbol, one));
-    let nine = find_symbol(&zero_six_nine, |symbol| contains(symbol, four));
-    let zero = find_symbol(&zero_six_nine, |&&symbol| symbol != six && symbol != nine);
-    symbol_table.insert(zero, '0');
-    symbol_table.insert(six, '6');
-    symbol_table.insert(nine, '9');
+    signals[6] = find_symbol(&zero_six_nine, |symbol| !contains(symbol, signals[1]));
+    signals[9] = find_symbol(&zero_six_nine, |symbol| contains(symbol, signals[4]));
+    signals[0] = find_symbol(&zero_six_nine, |&&symbol| {
+        symbol != signals[6] && symbol != signals[9]
+    });
 
     let two_three_five = len_n_symbols(input, 5); // acdeg, acdfg, abdfg
-    let three = find_symbol(&two_three_five, |symbol| contains(symbol, one));
-    let five = find_symbol(&two_three_five, |symbol| contains(six, symbol));
-    let two = find_symbol(&two_three_five, |&&symbol| {
-        symbol != three && symbol != five
+    signals[3] = find_symbol(&two_three_five, |symbol| contains(symbol, signals[1]));
+    signals[5] = find_symbol(&two_three_five, |symbol| contains(signals[6], symbol));
+    signals[2] = find_symbol(&two_three_five, |&&symbol| {
+        symbol != signals[3] && symbol != signals[5]
     });
-    symbol_table.insert(two, '2');
-    symbol_table.insert(three, '3');
-    symbol_table.insert(five, '5');
 
-    let digits: String = output
-        .iter()
-        .map(|symbol| symbol_table[symbol.as_str()])
-        .collect();
-
-    u32::from_str_radix(&digits, 10).unwrap()
+    output.iter().fold(0, |total, next| {
+        total * 10 + signals.iter().position(|signal| signal == next).unwrap() as u32
+    })
 }
 
 fn part2(data: &Vec<Vec<Vec<String>>>) -> u32 {
