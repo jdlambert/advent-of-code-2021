@@ -1,7 +1,7 @@
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashSet};
 
-fn cell_risk(i: usize, j: usize, grid: &Vec<Vec<u32>>) -> u32 {
+fn cell_risk(i: usize, j: usize, grid: &[Vec<u32>]) -> u32 {
     let tile_i = (i / grid.len()) as u32;
     let tile_j = (j / grid[0].len()) as u32;
 
@@ -13,7 +13,7 @@ fn cell_risk(i: usize, j: usize, grid: &Vec<Vec<u32>>) -> u32 {
     }
 }
 
-fn solve(grid: &Vec<Vec<u32>>, factor: usize) -> u32 {
+fn solve(grid: &[Vec<u32>], factor: usize) -> u32 {
     let height = factor * grid.len();
     let width = factor * grid[0].len();
 
@@ -53,15 +53,15 @@ fn solve(grid: &Vec<Vec<u32>>, factor: usize) -> u32 {
 
 fn main() {
     let content = include_str!("../input.txt");
-    let tile = content
+    let tile: Vec<_> = content
         .lines()
         .map(|line| {
             line.chars()
                 .map(|digit| digit.to_digit(10).unwrap())
-                .collect()
+                .collect::<Vec<_>>()
         })
         .collect();
 
-    println!("Part 1: {}", solve(&tile, 1));
-    println!("Part 2: {}", solve(&tile, 5));
+    println!("Part 1: {}", solve(&tile[..], 1));
+    println!("Part 2: {}", solve(&tile[..], 5));
 }

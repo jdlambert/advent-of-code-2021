@@ -14,16 +14,6 @@ struct PacketParser {
 }
 
 impl PacketParser {
-    fn parse(hex: &str) -> Packet {
-        let binary = hex
-            .trim()
-            .chars()
-            .map(|ch| format!("{:04b}", ch.to_digit(16).unwrap()))
-            .collect();
-        let mut parser = PacketParser { binary, i: 0 };
-        parser.parse_helper()
-    }
-
     fn read(&mut self, take: usize) -> u64 {
         let value = u64::from_str_radix(&self.binary[self.i..self.i + take], 2).unwrap();
         self.i += take;
@@ -43,28 +33,24 @@ impl PacketParser {
     }
 
     fn parse_operator(&mut self, version: u64, opcode: u64) -> Packet {
+        let mut packets = vec![];
         if self.read(1) == 1 {
-            let packet_count = self.read(11);
-            let packets = (0..packet_count).map(|_| self.parse_helper()).collect();
-
-            Packet {
-                version,
-                inner: InnerPacket::Operator { opcode, packets },
+            for _ in 0..self.read(11) {
+                packets.push(self.parse())
             }
         } else {
             let ending_bit = self.read(15) as usize + self.i;
-            let mut packets = vec![];
             while self.i < ending_bit {
-                packets.push(self.parse_helper());
+                packets.push(self.parse());
             }
-            Packet {
-                version,
-                inner: InnerPacket::Operator { opcode, packets },
-            }
+        }
+        Packet {
+            version,
+            inner: InnerPacket::Operator { opcode, packets },
         }
     }
 
-    fn parse_helper(&mut self) -> Packet {
+    fn parse(&mut self) -> Packet {
         let version = self.read(3);
         let opcode = self.read(3);
 
@@ -77,6 +63,16 @@ impl PacketParser {
 }
 
 impl Packet {
+    fn from_str(hex: &str) -> Self {
+        let binary = hex
+            .trim()
+            .chars()
+            .map(|ch| format!("{:04b}", ch.to_digit(16).unwrap()))
+            .collect();
+        let mut parser = PacketParser { binary, i: 0 };
+        parser.parse()
+    }
+
     fn evaluate(&self) -> u64 {
         match &self.inner {
             InnerPacket::Literal(v) => *v,
@@ -104,7 +100,7 @@ impl Packet {
 
     fn version_sum(&self) -> u64 {
         self.version
-            + if let InnerPacket::Operator { opcode: _, packets } = &self.inner {
+            + if let InnerPacket::Operator { packets, .. } = &self.inner {
                 packets.iter().map(|p| p.version_sum()).sum()
             } else {
                 0
@@ -121,7 +117,7 @@ fn part2(packet: &Packet) -> u64 {
 }
 
 fn main() {
-    let packet = PacketParser::parse(include_str!("../input.txt"));
+    let packet = Packet::from_str(include_str!("../input.txt"));
     println!("Part 1: {}", part1(&packet));
     println!("Part 2: {}", part2(&packet));
 }

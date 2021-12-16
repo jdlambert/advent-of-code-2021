@@ -22,4 +22,4 @@ if [ ! -d $DIR ]; then
 fi
 
 cd $DIR
-[ -f Cargo.toml ] && printf "$RED\nRUST\n" && cargo fmt && cargo run --quiet
+[ -f Cargo.toml ] && printf "$RED\nRUST\n" && cargo fmt && (cargo clippy; cargo run --quiet)

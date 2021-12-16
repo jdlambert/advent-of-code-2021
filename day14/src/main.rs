@@ -46,8 +46,8 @@ fn part2(polymer: &Polymer, operations: &Operations) -> usize {
 fn main() {
     let (polymer, operations) = include_str!("../input.txt").split_once("\n\n").unwrap();
 
-    let first = polymer.chars().nth(0).unwrap();
-    let last = polymer.chars().nth_back(0).unwrap();
+    let first = polymer.chars().next().unwrap();
+    let last = polymer.chars().last().unwrap();
 
     let polymer = polymer
         .chars()
@@ -62,8 +62,8 @@ fn main() {
         .map(|line| {
             let (input, output) = line.split_once(" -> ").unwrap();
             (
-                (input.chars().nth(0).unwrap(), input.chars().nth(1).unwrap()),
-                output.chars().nth(0).unwrap(),
+                (input.chars().next().unwrap(), input.chars().nth(1).unwrap()),
+                output.chars().next().unwrap(),
             )
         })
         .collect();

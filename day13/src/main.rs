@@ -10,11 +10,11 @@ enum Fold {
 fn fold(points: &mut HashSet<(usize, usize)>, fold: &Fold) -> usize {
     let new_points: Vec<_> = match fold {
         Fold::X(val) => points
-            .drain_filter(|(x, _)| x > &val)
+            .drain_filter(|(x, _)| x > val)
             .map(|(x, y)| (2 * val - x, y))
             .collect(),
         Fold::Y(val) => points
-            .drain_filter(|(_, y)| y > &val)
+            .drain_filter(|(_, y)| y > val)
             .map(|(x, y)| (x, 2 * val - y))
             .collect(),
     };
@@ -22,12 +22,12 @@ fn fold(points: &mut HashSet<(usize, usize)>, fold: &Fold) -> usize {
     points.len()
 }
 
-fn part1(points: &HashSet<(usize, usize)>, folds: &Vec<Fold>) -> usize {
+fn part1(points: &HashSet<(usize, usize)>, folds: &[Fold]) -> usize {
     let mut points = points.clone();
     fold(&mut points, &folds[0])
 }
 
-fn part2(points: &HashSet<(usize, usize)>, folds: &Vec<Fold>) -> String {
+fn part2(points: &HashSet<(usize, usize)>, folds: &[Fold]) -> String {
     let mut points = points.clone();
     for instruction in folds {
         fold(&mut points, instruction);
@@ -62,16 +62,18 @@ fn main() {
     let (points, folds) = include_str!("../input.txt").split_once("\n\n").unwrap();
     let points = points
         .lines()
-        .map(|line| {
-            line.split_once(',').unwrap()
-        })
+        .map(|line| line.split_once(',').unwrap())
         .map(|(a, b)| (a.parse().unwrap(), b.parse().unwrap()))
         .collect();
 
-    let folds = folds
+    let folds: Vec<_> = folds
         .lines()
         .map(|line| {
-            let (axis, value) = line.strip_prefix("fold along ").unwrap().split_once('=').unwrap();
+            let (axis, value) = line
+                .strip_prefix("fold along ")
+                .unwrap()
+                .split_once('=')
+                .unwrap();
             let value = value.parse().unwrap();
             match axis {
                 "x" => Fold::X(value),
