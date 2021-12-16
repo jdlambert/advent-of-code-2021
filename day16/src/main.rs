@@ -2,73 +2,74 @@ enum InnerPacket {
     Literal(u64),
     Operator { opcode: u64, packets: Vec<Packet> },
 }
+
 struct Packet {
     version: u64,
     inner: InnerPacket,
 }
 
-fn parse_bin(binary: &str, skip: usize, take: usize) -> u64 {
-    u64::from_str_radix(&binary.chars().skip(skip).take(take).collect::<String>(), 2).unwrap()
+struct PacketParser {
+    binary: String,
+    i: usize,
 }
 
-fn from_string(binary: &str) -> (Packet, usize) {
-    let version = parse_bin(binary, 0, 3);
-    let opcode = parse_bin(binary, 3, 3);
-
-    if opcode == 4 {
-        let mut i = 6;
-        let mut literal = 0;
-        while parse_bin(binary, i, 1) == 1 {
-            literal = (literal << 4) | parse_bin(binary, i + 1, 4);
-            i += 5;
+impl PacketParser {
+    fn new(binary: &str) -> Self {
+        PacketParser {
+            binary: binary.to_owned(),
+            i: 0,
         }
-        literal = (literal << 4) | parse_bin(binary, i + 1, 4);
-        i += 5;
-        (
+    }
+
+    fn read(&mut self, take: usize) -> u64 {
+        let value = u64::from_str_radix(&self.binary[self.i..self.i + take], 2).unwrap();
+        self.i += take;
+        value
+    }
+
+    fn parse_literal(&mut self, version: u64) -> Packet {
+        let mut literal = 0;
+        while self.read(1) == 1 {
+            literal = (literal << 4) | self.read(4);
+        }
+        literal = (literal << 4) | self.read(4);
+        Packet {
+            version,
+            inner: InnerPacket::Literal(literal),
+        }
+    }
+
+    fn parse_operator(&mut self, version: u64, opcode: u64) -> Packet {
+        if self.read(1) == 1 {
+            let packet_count = self.read(11);
+            let packets = (0..packet_count).map(|_| self.parse()).collect();
+
             Packet {
                 version,
-                inner: InnerPacket::Literal(literal),
-            },
-            i,
-        )
-    } else {
-        let mut i = 6;
-        let length_type_id = parse_bin(binary, i, 1);
-        i += 1;
-        if length_type_id == 1 {
-            let packet_count = parse_bin(binary, i, 11);
-            i += 11;
-            let mut packets = vec![];
-            for _ in 0..packet_count {
-                let (subpacket, length) = from_string(&binary[i..]);
-                packets.push(subpacket);
-                i += length;
+                inner: InnerPacket::Operator { opcode, packets },
             }
-
-            (
-                Packet {
-                    version,
-                    inner: InnerPacket::Operator { opcode, packets },
-                },
-                i,
-            )
         } else {
-            let bit_count = parse_bin(binary, i, 15) as usize;
-            i += 15;
-            let ending_bit = i + bit_count;
+            let bit_count = self.read(15) as usize;
+            let ending_bit = self.i + bit_count;
             let mut packets = vec![];
-            while i < ending_bit {
-                let (subpacket, length) = from_string(&binary[i..]);
-                packets.push(subpacket);
-                i += length;
+            while self.i < ending_bit {
+                packets.push(self.parse());
             }
-            (
-                Packet {
-                    version,
-                    inner: InnerPacket::Operator { opcode, packets },
-                },
-                i,
-            )
+            Packet {
+                version,
+                inner: InnerPacket::Operator { opcode, packets },
+            }
+        }
+    }
+
+    fn parse(&mut self) -> Packet {
+        let version = self.read(3);
+        let opcode = self.read(3);
+
+        if opcode == 4 {
+            self.parse_literal(version)
+        } else {
+            self.parse_operator(version, opcode)
         }
     }
 }
@@ -136,7 +137,8 @@ fn main() {
         .map(|digit| format!("{:04b}", digit).chars().collect::<Vec<_>>())
         .flatten()
         .collect::<String>();
-    let (packet, _) = from_string(binary);
+    let mut parser = PacketParser::new(binary);
+    let packet = parser.parse();
     println!("Part 1: {}", part1(&packet));
     println!("Part 2: {}", part2(&packet));
 }
