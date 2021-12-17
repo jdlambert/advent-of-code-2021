@@ -1,4 +1,4 @@
-fn part1(notes: &Vec<Vec<Vec<String>>>) -> usize {
+fn part1(notes: &[Vec<Vec<String>>]) -> usize {
     notes
         .iter()
         .map(|note| &note[1])
@@ -10,7 +10,7 @@ fn part1(notes: &Vec<Vec<Vec<String>>>) -> usize {
         .count()
 }
 
-fn len_n_symbols(input: &Vec<String>, n: usize) -> Vec<&str> {
+fn len_n_symbols(input: &[String], n: usize) -> Vec<&str> {
     input
         .iter()
         .filter(|s| s.len() == n)
@@ -18,7 +18,7 @@ fn len_n_symbols(input: &Vec<String>, n: usize) -> Vec<&str> {
         .collect()
 }
 
-fn len_n_symbol(input: &Vec<String>, n: usize) -> &str {
+fn len_n_symbol(input: &[String], n: usize) -> &str {
     let symbols = len_n_symbols(input, n);
     assert_eq!(symbols.len(), 1);
     symbols[0]
@@ -27,10 +27,10 @@ fn len_n_symbol(input: &Vec<String>, n: usize) -> &str {
 fn contains(container: &str, containee: &str) -> bool {
     containee
         .chars()
-        .all(|letter| container.chars().find(|&c| c == letter).is_some())
+        .all(|letter| container.chars().any(|c| c == letter))
 }
 
-fn find_symbol<'a>(candidates: &'a Vec<&str>, predicate: impl Fn(&&&str) -> bool) -> &'a str {
+fn find_symbol<'a>(candidates: &'a [&str], predicate: impl Fn(&&&str) -> bool) -> &'a str {
     candidates.iter().find(predicate).unwrap()
 }
 
@@ -63,7 +63,7 @@ fn solve_note(note: &Vec<Vec<String>>) -> u32 {
     })
 }
 
-fn part2(data: &Vec<Vec<Vec<String>>>) -> u32 {
+fn part2(data: &[Vec<Vec<String>>]) -> u32 {
     data.iter().map(solve_note).sum()
 }
 
@@ -72,14 +72,14 @@ fn parse_note(note: &str) -> Vec<String> {
         .split_whitespace()
         .map(|s| {
             let mut chars: Vec<char> = s.chars().collect();
-            chars.sort();
+            chars.sort_unstable();
             String::from_iter(chars)
         })
         .collect()
 }
 
 fn main() {
-    let data = include_str!("../input.txt")
+    let data: Vec<_> = include_str!("../input.txt")
         .lines()
         .map(|line| line.split('|').map(parse_note).collect())
         .collect();

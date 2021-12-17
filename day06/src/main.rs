@@ -1,4 +1,4 @@
-fn simulate(data: &Vec<usize>, days: u32) -> u64 {
+fn simulate(data: &[usize], days: u32) -> u64 {
     let mut counts = vec![0; 9];
     for &fish in data {
         counts[fish] += 1;
@@ -10,16 +10,16 @@ fn simulate(data: &Vec<usize>, days: u32) -> u64 {
     counts.iter().sum()
 }
 
-fn part1(data: &Vec<usize>) -> u64 {
+fn part1(data: &[usize]) -> u64 {
     simulate(data, 80)
 }
 
-fn part2(data: &Vec<usize>) -> u64 {
+fn part2(data: &[usize]) -> u64 {
     simulate(data, 256)
 }
 
 fn main() {
-    let data = include_str!("../input.txt")
+    let data: Vec<_> = include_str!("../input.txt")
         .trim()
         .split(',')
         .map(|x| x.parse().unwrap())

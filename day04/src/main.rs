@@ -27,9 +27,9 @@ fn read_boards(input: &str) -> (Vec<i32>, Vec<Board>) {
     return (values, boards);
 }
 
-fn score_boards(values: Vec<i32>, mut boards: Vec<Board>) -> Vec<i32> {
+fn score_boards(values: &[i32], mut boards: Vec<Board>) -> Vec<i32> {
     let mut success = Vec::new();
-    for value in values {
+    for &value in values {
         boards.drain_filter(|board| {
             if let Some(score) = call_num(value, board) {
                 success.push(score);
@@ -66,17 +66,17 @@ fn call_num(value: i32, board: &mut Board) -> Option<i32> {
     None
 }
 
-fn part1(scores: &Vec<i32>) -> i32 {
+fn part1(scores: &[i32]) -> i32 {
     return *scores.first().unwrap();
 }
 
-fn part2(scores: &Vec<i32>) -> i32 {
+fn part2(scores: &[i32]) -> i32 {
     return *scores.last().unwrap();
 }
 
 fn main() {
     let (values, boards) = read_boards(include_str!("../input.txt"));
-    let scores = score_boards(values, boards);
+    let scores = score_boards(&values, boards);
     println!("Part 1: {}", part1(&scores));
     println!("Part 2: {}", part2(&scores));
 }

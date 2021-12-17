@@ -77,7 +77,7 @@ fn part2(data: &Vec<Vec<char>>) -> u64 {
         })
         .collect();
 
-    scores.sort();
+    scores.sort_unstable();
     scores[scores.len() / 2]
 }
 

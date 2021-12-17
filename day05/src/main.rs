@@ -17,7 +17,7 @@ fn dist(pair: Pair) -> i32 {
     (x0 - x1).abs().max((y0 - y1).abs())
 }
 
-fn overlaps(pairs: &Vec<Pair>) -> usize {
+fn overlaps(pairs: &[Pair]) -> usize {
     let mut map = HashMap::new();
     for pair in pairs {
         let &(x0, y0, x1, y1) = pair;
@@ -30,8 +30,8 @@ fn overlaps(pairs: &Vec<Pair>) -> usize {
     map.values().filter(|&&val| val > 1).count()
 }
 
-fn part1(pairs: &Vec<Pair>) -> usize {
-    let straight_lines = pairs
+fn part1(pairs: &[Pair]) -> usize {
+    let straight_lines: Vec<_> = pairs
         .iter()
         .filter(|(x0, y0, x1, y1)| x0 == x1 || y0 == y1)
         .cloned()
@@ -39,12 +39,12 @@ fn part1(pairs: &Vec<Pair>) -> usize {
     overlaps(&straight_lines)
 }
 
-fn part2(pairs: &Vec<Pair>) -> usize {
+fn part2(pairs: &[Pair]) -> usize {
     overlaps(pairs)
 }
 
 fn main() {
-    let pairs: Vec<Pair> = include_str!("../input.txt")
+    let pairs: Vec<_> = include_str!("../input.txt")
         .lines()
         .map(|line| {
             let splits: Vec<i32> = line

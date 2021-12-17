@@ -58,8 +58,8 @@ fn part2(heights: &Vec<Vec<u32>>) -> usize {
             }
         }
     }
-    basin_sizes.sort_by(|a, b| b.cmp(a));
-    basin_sizes.iter().take(3).product()
+    basin_sizes.sort_unstable();
+    basin_sizes.iter().rev().take(3).product()
 }
 
 fn main() {

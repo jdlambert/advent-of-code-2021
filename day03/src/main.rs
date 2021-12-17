@@ -1,4 +1,4 @@
-fn digit_delta(data: &Vec<&str>, index: usize) -> i32 {
+fn digit_delta(data: &[&str], index: usize) -> i32 {
     data.iter().fold(0, |delta, &line| {
         delta
             + match line.chars().nth(index).unwrap() {
@@ -9,7 +9,7 @@ fn digit_delta(data: &Vec<&str>, index: usize) -> i32 {
     })
 }
 
-fn part1(data: &Vec<&str>) -> u32 {
+fn part1(data: &[&str]) -> u32 {
     let (gamma, epsilon) = (0..data[0].len()).fold((0, 0), |(gamma, epsilon), index| {
         let nth = if digit_delta(data, index) > 0 { 1 } else { 0 };
         ((gamma << 1) | nth, (epsilon << 1) | (1 - nth))
@@ -35,12 +35,12 @@ fn life_support_rating(mut data: Vec<&str>, default: char) -> u32 {
     u32::from_str_radix(data[0], 2).unwrap()
 }
 
-fn part2(data: &Vec<&str>) -> u32 {
-    life_support_rating(data.clone(), '1') * life_support_rating(data.clone(), '0')
+fn part2(data: &[&str]) -> u32 {
+    life_support_rating(data.to_owned(), '1') * life_support_rating(data.to_owned(), '0')
 }
 
 fn main() {
-    let data = include_str!("../input.txt").lines().collect();
+    let data: Vec<_> = include_str!("../input.txt").lines().collect();
     println!("Part 1: {}", part1(&data));
     println!("Part 2: {}", part2(&data));
 }
