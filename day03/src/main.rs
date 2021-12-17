@@ -17,7 +17,8 @@ fn part1(data: &[&str]) -> u32 {
     gamma * epsilon
 }
 
-fn life_support_rating(mut data: Vec<&str>, default: char) -> u32 {
+fn life_support_rating(data: &[&str], default: char) -> u32 {
+    let mut data = data.to_owned();
     let mut i = 0;
     while data.len() > 1 {
         let nth = if digit_delta(&data, i) >= 0 {
@@ -36,7 +37,7 @@ fn life_support_rating(mut data: Vec<&str>, default: char) -> u32 {
 }
 
 fn part2(data: &[&str]) -> u32 {
-    life_support_rating(data.to_owned(), '1') * life_support_rating(data.to_owned(), '0')
+    life_support_rating(data, '1') * life_support_rating(data, '0')
 }
 
 fn main() {
