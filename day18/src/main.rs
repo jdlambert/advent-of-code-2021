@@ -48,31 +48,31 @@ impl FishNum {
 
     fn magnitude(&self) -> u32 {
         match self {
-            FishNum::Value(v) => *v,
-            FishNum::Pair(l, r) => 3 * l.magnitude() + 2 * r.magnitude(),
+            Self::Value(v) => *v,
+            Self::Pair(l, r) => 3 * l.magnitude() + 2 * r.magnitude(),
         }
     }
 
     fn add_left(&self, value: u32) -> Self {
         match self {
-            FishNum::Value(v) => FishNum::Value(v + value),
-            FishNum::Pair(a, b) => FishNum::Pair(Box::new(a.add_left(value)), b.clone()),
+            Self::Value(v) => Self::Value(v + value),
+            Self::Pair(a, b) => Self::Pair(Box::new(a.add_left(value)), b.clone()),
         }
     }
 
     fn add_right(&self, value: u32) -> Self {
         match self {
-            FishNum::Value(v) => FishNum::Value(v + value),
-            FishNum::Pair(a, b) => FishNum::Pair(a.clone(), Box::new(b.add_right(value))),
+            Self::Value(v) => Self::Value(v + value),
+            Self::Pair(a, b) => Self::Pair(a.clone(), Box::new(b.add_right(value))),
         }
     }
 
     fn explode_helper(&self, depth: usize) -> Option<(Option<u32>, Self, Option<u32>)> {
-        if let FishNum::Pair(a, b) = self {
+        if let Self::Pair(a, b) = self {
             if depth > 3 {
                 let (a, b) = (a.clone(), b.clone());
-                if let (FishNum::Value(a), FishNum::Value(b)) = (*a, *b) {
-                    Some((Some(a), FishNum::Value(0), Some(b)))
+                if let (Self::Value(a), Self::Value(b)) = (*a, *b) {
+                    Some((Some(a), Self::Value(0), Some(b)))
                 } else {
                     None
                 }
@@ -80,21 +80,21 @@ impl FishNum {
                 if let Some(v) = r {
                     Some((
                         l,
-                        FishNum::Pair(Box::new(new_a), Box::new(b.add_left(v))),
+                        Self::Pair(Box::new(new_a), Box::new(b.add_left(v))),
                         None,
                     ))
                 } else {
-                    Some((l, FishNum::Pair(Box::new(new_a), b.clone()), r))
+                    Some((l, Self::Pair(Box::new(new_a), b.clone()), r))
                 }
             } else if let Some((l, new_b, r)) = b.explode_helper(depth + 1) {
                 if let Some(v) = l {
                     Some((
                         None,
-                        FishNum::Pair(Box::new(a.add_right(v)), Box::new(new_b)),
+                        Self::Pair(Box::new(a.add_right(v)), Box::new(new_b)),
                         r,
                     ))
                 } else {
-                    Some((l, FishNum::Pair(a.clone(), Box::new(new_b)), r))
+                    Some((l, Self::Pair(a.clone(), Box::new(new_b)), r))
                 }
             } else {
                 None
@@ -114,16 +114,16 @@ impl FishNum {
 
     fn split(&self) -> Option<Self> {
         match self {
-            FishNum::Value(a) if *a > 9 => Some(FishNum::Pair(
-                Box::new(FishNum::Value(a / 2)),
-                Box::new(FishNum::Value(a - a / 2)),
+            Self::Value(a) if *a > 9 => Some(Self::Pair(
+                Box::new(Self::Value(a / 2)),
+                Box::new(Self::Value(a - a / 2)),
             )),
-            FishNum::Value(_) => None,
-            FishNum::Pair(a, b) => {
+            Self::Value(_) => None,
+            Self::Pair(a, b) => {
                 if let Some(a) = a.split() {
-                    Some(FishNum::Pair(Box::new(a), b.clone()))
+                    Some(Self::Pair(Box::new(a), b.clone()))
                 } else if let Some(b) = b.split() {
-                    Some(FishNum::Pair(a.clone(), Box::new(b)))
+                    Some(Self::Pair(a.clone(), Box::new(b)))
                 } else {
                     None
                 }
@@ -157,8 +157,8 @@ impl FishNum {
 impl fmt::Display for FishNum {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            FishNum::Value(a) => write!(f, "{}", a),
-            FishNum::Pair(a, b) => {
+            Self::Value(a) => write!(f, "{}", a),
+            Self::Pair(a, b) => {
                 write!(f, "[")?;
                 write!(f, "{}", a)?;
                 write!(f, ",")?;
@@ -176,10 +176,8 @@ fn part1(nums: &[FishNum]) -> u32 {
 fn part2(nums: &[FishNum]) -> u32 {
     let mut max = u32::MIN;
     for i in 0..nums.len() {
-        for j in 0..nums.len() {
-            if i != j {
-                max = max.max(nums[i].add(&nums[j]).magnitude());
-            }
+        for j in (i + 1)..nums.len() {
+            max = max.max(nums[i].add(&nums[j]).magnitude());
         }
     }
     max
