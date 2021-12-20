@@ -72,16 +72,12 @@ fn find_match(
         return None;
     }
 
-    for (f, unknown_pair) in matching_fprints {
-        for known_pair in known_fingerprints.get(f).unwrap() {
-            let (k0, k1) = *known_pair;
-            let (u0, u1) = *unknown_pair;
-
+    for (fprint, (u0, u1)) in matching_fprints {
+        for (k0, k1) in known_fingerprints.get(fprint).unwrap() {
             for rotation in 0..24 {
-                if sub(k0, rotate(u0, rotation)) == sub(k1, rotate(u1, rotation)) {
-                    let translation = sub(k0, rotate(u0, rotation));
-
-                    let transformed_beacons: Vec<_> = beacons
+                let translation = sub(*k0, rotate(*u0, rotation));
+                if translation == sub(*k1, rotate(*u1, rotation)) {
+                    let transformed_beacons = beacons
                         .iter()
                         .map(|&p| add(translation, rotate(p, rotation)))
                         .collect();
@@ -96,9 +92,8 @@ fn find_match(
 fn extend_fingerprints(fingerprints: &mut Fingerprints, scanner: &[Point]) {
     for i in 0..scanner.len() {
         for j in (i + 1)..scanner.len() {
-            let f = fingerprint(scanner[i], scanner[j]);
             fingerprints
-                .entry(f)
+                .entry(fingerprint(scanner[i], scanner[j]))
                 .or_default()
                 .push((scanner[i], scanner[j]));
         }
