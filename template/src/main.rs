@@ -1,9 +1,9 @@
-fn part1(data: &Vec<u32>) -> &str {
-    "nothing yet"
+fn part1(data: &Vec<u32>) -> u32 {
+    0
 }
 
-fn part2(data: &Vec<u32>) -> &str {
-    "nothing yet"
+fn part2(data: &Vec<u32>) -> u32 {
+    0
 }
 
 fn main() {
