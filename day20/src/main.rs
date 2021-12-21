@@ -35,16 +35,16 @@ fn step(image: &Image, code: &Vec<u8>) -> Image {
     let new_width = image.width + 2;
     let new_height = image.height + 2;
 
-    let mut new_pixels = vec![0; new_width * new_height];
+    let mut new_pixels = Vec::with_capacity(new_width * new_height);
     let mut row_head_score = if image.padding == 0 { 0 } else { 511 };
     let mut cell_score;
     for i in 0..new_height {
         row_head_score = down_num(image, row_head_score, i);
         cell_score = row_head_score;
-        new_pixels[i * new_width] = code[cell_score];
+        new_pixels.push(code[cell_score]);
         for j in 1..new_width {
             cell_score = right_num(image, cell_score, i, j);
-            new_pixels[i * new_width + j] = code[cell_score];
+            new_pixels.push(code[cell_score]);
         }
     }
     let padding = if image.padding == 0 {
