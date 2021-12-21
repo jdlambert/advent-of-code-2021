@@ -4,16 +4,12 @@ struct Image {
     padding: u8,
 }
 
-fn index(image: &Image, i: usize, j: usize) -> u8 {
-    image.pixels[i * image.width + j]
-}
-
-fn pixel_count(image: &Image) -> usize {
-    image.pixels.iter().filter(|&&v| v == 1).count()
-}
-
-fn start_num(prev_image: &Image) -> usize {
-    (0..9).fold(0, |num, _| num << 1 | prev_image.padding as usize)
+fn index_or_pad(image: &Image, i: Option<usize>, j: usize) -> usize {
+    if i.is_some() && i.unwrap() < image.pixels.len() / image.width && j < image.width {
+        image.pixels[i.unwrap() * image.width + j] as usize
+    } else {
+        image.padding as usize
+    }
 }
 
 fn down_num(image: &Image, prev: usize, i: usize) -> usize {
@@ -30,31 +26,13 @@ fn down_num(image: &Image, prev: usize, i: usize) -> usize {
 }
 
 fn right_num(image: &Image, prev: usize, i: usize, j: usize) -> usize {
-    let (new0, new1, new2) = if j >= image.width {
-        (image.padding, image.padding, image.padding)
-    } else {
-        let n0 = if i > 1 {
-            index(image, i - 2, j)
-        } else {
-            image.padding
-        };
-        let height = image.pixels.len() / image.width;
-        let n1 = if i > 0 && i < height + 1 {
-            index(image, i - 1, j)
-        } else {
-            image.padding
-        };
-        let n2 = if i < height {
-            index(image, i, j)
-        } else {
-            image.padding
-        };
-        (n0, n1, n2)
-    };
+    let top = index_or_pad(image, i.checked_sub(2), j);
+    let middle = index_or_pad(image, i.checked_sub(1), j);
+    let bottom = index_or_pad(image, Some(i), j);
     (prev & 0b011_011_011) << 1 // Lose the leftmost three bits
-        | (new0 as usize) << 6
-        | (new1 as usize) << 3
-        | (new2 as usize)
+        | (top as usize) << 6
+        | (middle as usize) << 3
+        | (bottom as usize)
 }
 
 fn step(image: &Image, code: &Vec<u8>) -> Image {
@@ -68,13 +46,7 @@ fn step(image: &Image, code: &Vec<u8>) -> Image {
     let new_height = image.pixels.len() / image.width + 2;
 
     let mut new_pixels = vec![0; new_width * new_height];
-    let offset = new_width + 1;
-    for (line, chunk) in image.pixels.chunks(image.width).enumerate() {
-        let pos = line * new_width + offset;
-        new_pixels[pos..pos + image.width].copy_from_slice(chunk);
-    }
-
-    let mut row_head_score = start_num(image);
+    let mut row_head_score = if image.padding == 0 { 0 } else { 511 };
     let mut cell_score;
     for i in 0..new_height {
         row_head_score = down_num(image, row_head_score, i);
@@ -93,18 +65,22 @@ fn step(image: &Image, code: &Vec<u8>) -> Image {
     }
 }
 
+fn pixel_count(image: &Image) -> usize {
+    image.pixels.iter().filter(|&&v| v == 1).count()
+}
+
+fn parse(s: &str) -> Vec<u8> {
+    s.chars()
+        .filter(|&c| c == '#' || c == '.')
+        .map(|bit| if bit == '#' { 1 } else { 0 })
+        .collect()
+}
+
 fn main() {
     let (code, image) = include_str!("../input.txt").split_once("\n\n").unwrap();
-    let code: Vec<_> = code
-        .chars()
-        .filter(|&c| c == '#' || c == '.')
-        .map(|bit| if bit == '#' { 1 } else { 0 })
-        .collect();
-    let pixels: Vec<_> = image
-        .chars()
-        .filter(|&c| c == '#' || c == '.')
-        .map(|bit| if bit == '#' { 1 } else { 0 })
-        .collect();
+    let code = parse(code);
+    let pixels = parse(image);
+
     let width = image.lines().next().unwrap().len();
     let mut image = Image {
         pixels,
