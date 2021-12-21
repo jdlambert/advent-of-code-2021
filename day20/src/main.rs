@@ -13,16 +13,11 @@ fn index_or_pad(image: &Image, i: Option<usize>, j: usize) -> usize {
 }
 
 fn down_num(image: &Image, prev: usize, i: usize) -> usize {
-    let height = image.pixels.len() / image.width;
-    let new = if i >= height - 1 {
-        image.padding
-    } else {
-        image.pixels[i * image.width]
-    };
+    let corner = index_or_pad(image, Some(i), 0);
     (prev & 0b111_111) << 3 // Lose the top three bits
         | (image.padding as usize) << 2
         | (image.padding as usize) << 1
-        | new as usize
+        | corner as usize
 }
 
 fn right_num(image: &Image, prev: usize, i: usize, j: usize) -> usize {
@@ -32,16 +27,10 @@ fn right_num(image: &Image, prev: usize, i: usize, j: usize) -> usize {
     (prev & 0b011_011_011) << 1 // Lose the leftmost three bits
         | (top as usize) << 6
         | (middle as usize) << 3
-        | (bottom as usize)
+        | bottom as usize
 }
 
 fn step(image: &Image, code: &Vec<u8>) -> Image {
-    let padding = if image.padding == 0 {
-        code[0]
-    } else {
-        code[511]
-    };
-
     let new_width = image.width + 2;
     let new_height = image.pixels.len() / image.width + 2;
 
@@ -57,6 +46,11 @@ fn step(image: &Image, code: &Vec<u8>) -> Image {
             new_pixels[i * new_width + j] = code[cell_score];
         }
     }
+    let padding = if image.padding == 0 {
+        code[0]
+    } else {
+        code[511]
+    };
 
     Image {
         pixels: new_pixels,
