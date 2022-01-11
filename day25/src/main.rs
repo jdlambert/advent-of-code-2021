@@ -6,31 +6,14 @@ enum Cuke {
 
 type Cukes = Vec<Vec<Option<Cuke>>>;
 
-fn show(cukes: &Cukes) {
-    for row in cukes {
-        for cuke in row {
-            print!("{}", match cuke {
-                None => ".",
-                Some(Cuke::S) => "v",
-                Some(Cuke::E) => ">",
-            })
-        }
-        println!();
-    }
-}
-
 fn should_move(cukes: &Cukes, i: usize, j: usize, allowed: Cuke) -> bool {
     match &cukes[i][j] {
-        Some(cuke) => {
-            if *cuke == allowed {
-                let (i, j) = match allowed {
-                    Cuke::E => (i, (j + 1) % cukes[0].len()),
-                    Cuke::S => ((i + 1) % cukes.len(), j),
-                };
-                cukes[i][j].is_none()
-            } else {
-                false
-            }
+        Some(cuke) if *cuke == allowed => {
+            let (i, j) = match allowed {
+                Cuke::E => (i, (j + 1) % cukes[0].len()),
+                Cuke::S => ((i + 1) % cukes.len(), j),
+            };
+            cukes[i][j].is_none()
         }
         _ => false,
     }
@@ -56,7 +39,7 @@ fn perform_moves(cukes: &mut Cukes, allowed: Cuke) -> bool {
     let mut moves = vec![];
     for i in 0..cukes.len() {
         for j in 0..cukes[0].len() {
-            if should_move(&cukes, i, j, allowed) {
+            if should_move(cukes, i, j, allowed) {
                 moves.push((i, j))
             }
         }
@@ -73,8 +56,8 @@ fn part1(mut cukes: Cukes) -> u32 {
     loop {
         step += 1;
         let moved = perform_moves(&mut cukes, Cuke::E);
-        if !moved &&  !perform_moves(&mut cukes, Cuke::S) {
-             return step;
+        if !perform_moves(&mut cukes, Cuke::S) && !moved {
+            return step;
         }
     }
 }
@@ -93,6 +76,5 @@ fn main() {
                 .collect()
         })
         .collect();
-    show(&cukes);
     println!("Part 1: {}", part1(cukes));
 }
