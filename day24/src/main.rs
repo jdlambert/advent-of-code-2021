@@ -4,8 +4,8 @@ type Program = Vec<Block>;
 fn solve(program: &Program, init: i8) -> u64 {
     let mut num = vec![init; 14];
     let mut stack = vec![];
-    for (i, &(shift, check, _)) in program.iter().enumerate() {
-        if shift == 0 {
+    for (i, &(div, check, _)) in program.iter().enumerate() {
+        if div == 1 {
             stack.push(i);
         } else {
             let j = stack.pop().unwrap();
@@ -39,7 +39,7 @@ fn extract(s: &str) -> i8 {
 fn main() {
     let lines: Vec<_> = include_str!("../input.txt").lines().collect();
     let program: Vec<_> = lines.chunks_exact(18).map(|block_lines| {
-        (extract(block_lines[4]) / 26, extract(block_lines[5]), extract(block_lines[15]))
+        (extract(block_lines[4]), extract(block_lines[5]), extract(block_lines[15]))
     }).collect();
     println!("{}", part1(&program));
     println!("{}", part2(&program));
